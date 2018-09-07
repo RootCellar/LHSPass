@@ -2,7 +2,9 @@
 Changes
 ---------
 
-Info is from engineering notebook
+Info is from engineering notebook, and is summarized.
+
+Notebook itself may be more up-to-date.
 
 Development started: 8/25/18
 
