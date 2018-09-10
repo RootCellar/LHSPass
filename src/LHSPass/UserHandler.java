@@ -158,11 +158,18 @@ public class UserHandler implements InputUser
             ArrayList<String> args = Command.getArgs(s);
 
             tagSwipe( args.get( args.size() - 1 ) );
+            
+            return;
         }
 
         if(state.equals(State.DEBUG)) {
             //if( s.equals("/stop") ) runner.inputText(s);
-            runner.inputText(s);
+            if(s.equals("BACK")) {
+                goBack();
+            }
+            else runner.inputText(s);
+            
+            return;
         }
         
         if(state.equals(State.USER_MENU)) {
@@ -175,6 +182,11 @@ public class UserHandler implements InputUser
                 currentUser = null;
             }
             
+            if(s.equals("ADMIN")) {
+                addState( State.DEBUG );
+            }
+            
+            return;
         }
     }
 
