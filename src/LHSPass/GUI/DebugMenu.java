@@ -46,7 +46,7 @@ public class DebugMenu extends Menu implements ActionListener
         buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
         buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
         buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
-        buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
+        buttonPanel.add( getNewButton( "BACK", "BACK" ) );
         
         /*
         buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
