@@ -103,16 +103,19 @@ public class UserHandler implements InputUser
      * Queue adds to position 0 (FILO, or First In Last Out)
      */
     public void goBack() {
+        out("Going back a menu...");
         state.getMenu().setVisible(false);
         
         if(menuQueue.size() > 0) menuQueue.remove(0);
 
         if(menuQueue.size() == 0) {
+            out("Menu queue empty. Going to default menu...");
             stateSet(State.AWAIT_USER);
             return;
         }
 
         stateSet( menuQueue.get( menuQueue.size() - 1 ) );
+        out(menuQueue.size() + " menus in queue after going back");
     }
 
     /*
@@ -121,8 +124,12 @@ public class UserHandler implements InputUser
      * (which would make this method useless)
      */
     public void addState(State toAdd) {
+        out("Adding a state to the queue...");
+        
         menuQueue.add(0, toAdd);
         stateSet(toAdd);
+        
+        out(menuQueue.size() + " menus in queue after adding one");
     }
 
     //Set the menu, clearing the menu queue
