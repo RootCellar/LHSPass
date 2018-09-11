@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import javax.swing.*;
 
 import Logging.*;
 import GUI.*;
@@ -12,7 +13,7 @@ public class UserHandler implements InputUser
         AWAIT_USER( new DefaultMenu() ), //Await user tag swipe
         //AWAIT_ADMIN, // Await admin override
         USER_MENU( new UserLeaveMenu() ), //User is at menu
-        //USER_GONE, //User left the room
+        USER_GONE( new UserGoneMenu() ), //User left the room
         DEBUG( new DebugMenu() ), // Debug menu with buttons
         ;
 
@@ -58,6 +59,8 @@ public class UserHandler implements InputUser
     Runner runner;
 
     User currentUser;
+    String went = "";
+    long menuSetTime = System.nanoTime();
 
     public UserHandler(Runner r) {
         runner = r;
@@ -135,16 +138,23 @@ public class UserHandler implements InputUser
     //Set the menu, clearing the menu queue
     public void setState(State to) {
         closeAll();
+        
         resetQueue();
+        
         stateSet(to);
     }
 
     public void stateSet(State to) {
         out("Setting state...");
+        
         resetUser();
         state = to;
+        
         state.getMenu().setVisible(true);
         state.getMenu().setUser(this);
+        
+        menuSetTime = System.nanoTime();
+        
         out(to.toString());
     }
 
@@ -155,6 +165,16 @@ public class UserHandler implements InputUser
     public void tick() {
         while(commands.size()>0) {
             run( commands.remove(0) );
+        }
+        
+        if( state.equals(State.USER_GONE) ) {
+            UserGoneMenu m = (UserGoneMenu) state.getMenu();
+            
+            if( currentUser != null ) m.setName( currentUser.getName() );
+            
+            m.setTime( System.nanoTime() - menuSetTime );
+            
+            m.setLoc( went );
         }
     }
 
@@ -180,6 +200,8 @@ public class UserHandler implements InputUser
         }
         
         if(state.equals(State.USER_MENU)) {
+            if(currentUser == null) setState( State.AWAIT_USER);
+            
             UserLeaveMenu m = (UserLeaveMenu) state.getMenu();
             
             if(s.equals("BACK")) {
@@ -193,11 +215,33 @@ public class UserHandler implements InputUser
                 addState( State.DEBUG );
             }
             
+            if( s.equals("RESTROOM") || s.equals("LOCKER") || s.equals("WATER") || s.equals("OTHER") ) {
+                
+                boolean has = currentUser.getPermissionList().has( "USER_" + s );
+                
+                if(!has) {
+                    JOptionPane.showMessageDialog( null, "You don't have permission: " + "USER_" + s );
+                    out(currentUser.getName() + " denied permission for: " + s);
+                    return;
+                }
+                
+                addState(State.USER_GONE);
+                
+                went = s;
+                
+                out("Successfully allowed a student to leave the room: " + currentUser.getName() + " --> " + went );
+                
+                userLog("Left to go to the " + s );
+                
+            }
+            
             return;
         }
     }
 
     public void tagSwipe(String serial) {
+        out("Received tag: " + serial);
+        
         if( state.equals( State.AWAIT_USER ) ) {
             //addState( State.USER_MENU );
 
@@ -224,6 +268,21 @@ public class UserHandler implements InputUser
                 userLog("Signed in!");
             } 
 
+        }
+        
+        if( state.equals( State.USER_GONE ) ) {
+            
+            if( currentUser == null ) setState( State.AWAIT_USER );
+            
+            if( serial.equals( currentUser.getTag() ) ) {
+                out( currentUser.getName() + " is back" );
+                
+                userLog("Returned to the room from " + went);
+                
+                went = "Too bad you'll never see this. If you do, it's a bug.";
+                
+                setState( State.AWAIT_USER );
+            }
         }
     }
     
