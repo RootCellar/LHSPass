@@ -7,12 +7,12 @@ import java.util.ArrayList;
 
 public class DataDisplay extends JFrame implements ActionListener {
     public JLabel[] labels;
-    public DataDisplay(int n) {
+    public DataDisplay(int n, int w) {
         this.setSize(100,100);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         labels = new JLabel[n];
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(40,20));
+        panel.setLayout(new GridLayout(n / w, w));
         panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
         //Text Fields for numbers

@@ -10,7 +10,7 @@ public class Menu extends JFrame
     InputUser user;
     
     public Menu() {
-        setPreferredSize( new Dimension( 400, 400 ) );
+        setPreferredSize( new Dimension( 600, 600 ) );
         
         //setPreferredSize( Toolkit.getDefaultToolkit().getScreenSize() );
         //setLocationRelativeTo(null);

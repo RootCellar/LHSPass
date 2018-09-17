@@ -61,10 +61,20 @@ public class UserHandler implements InputUser
     User currentUser;
     String went = "";
     long menuSetTime = System.nanoTime();
+    
+    TwitterHandler twha;
 
     public UserHandler(Runner r) {
         runner = r;
         setup();
+        
+        twha = new TwitterHandler(r);
+        
+        twha.send( "User Handler up and running" );
+    }
+    
+    public TwitterHandler getTwitterHandler() {
+        return twha;
     }
 
     public ArrayList<State> getQueue() {
@@ -230,6 +240,8 @@ public class UserHandler implements InputUser
                 went = s;
                 
                 out("Successfully allowed a student to leave the room: " + currentUser.getName() + " --> " + went );
+                twha.send( currentUser.getName() + " left for " + went );
+                
                 
                 userLog("Left to go to the " + s );
                 
@@ -278,6 +290,7 @@ public class UserHandler implements InputUser
                 out( currentUser.getName() + " is back" );
                 
                 userLog("Returned to the room from " + went);
+                twha.send(currentUser.getName() + " returned to the room from " + went + " after " + ( ( System.nanoTime() - menuSetTime ) / 1000000000 ) + "s" );
                 
                 went = "Too bad you'll never see this. If you do, it's a bug.";
                 

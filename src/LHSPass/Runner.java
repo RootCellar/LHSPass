@@ -24,6 +24,7 @@ public class Runner implements Runnable, InputUser
     int waitTime = 100;
 
     Terminal term = new Terminal();
+    DataDisplay disp = new DataDisplay(20, 2);
 
     long startTime = System.nanoTime();
 
@@ -31,7 +32,7 @@ public class Runner implements Runnable, InputUser
     ArrayList<String> commands = new ArrayList<String>();
 
     FileHandler schRead = new FileHandler(this);
-    
+
     UserHandler handler = new UserHandler(this);
 
     Schedule sch;
@@ -49,12 +50,12 @@ public class Runner implements Runnable, InputUser
     public Runner() {
 
     }
-    
+
     public User getUserByTag(String t) {
         for( int i = 0; i < userList.size(); i++) {
             if( userList.get(i).getTag().equals(t) ) return userList.get(i);
         }
-        
+
         return null;
     }
 
@@ -92,21 +93,40 @@ public class Runner implements Runnable, InputUser
     public synchronized void run() {
         out("Starting loop...");
         out("Type '/help' for a list of commands");
-        while(going) {
+        
+        int exceptionsInRow = 0; //Keep track of the number interrupted loops in a row
+        
+        handler.getTwitterHandler().send( "Program starting. Entering main loop...");
+        
+        loop: while(going) {
             try{
-                if(!going) break;
+                if(!going) break loop;
 
                 tick();
-                
+
                 runCommands();
 
-                Thread.sleep(waitTime);
-            }catch(Exception e) {
+                wait( waitTime );
+                
+                exceptionsInRow = 0; //No exceptions this loop. Reset counter
+            }catch(Exception e) { //If there are too many exceptions in a row, close the program due to constant problems.
                 e.printStackTrace();
 
                 out("EXCEPTION IN RUNNER THREAD");
+                
+                wait(1000); //Let's not spam the terminal with exceptions
+                
+                exceptionsInRow++;
+                if(exceptionsInRow > 10) {
+                    out("Too many exceptions in a row. Closing...");
+                    wait(3000);
+                    break loop;
+                }
+                
             }
         }
+        
+        handler.getTwitterHandler().send( "Program shutting down..." );
 
         out("Exited loop");
 
@@ -114,8 +134,9 @@ public class Runner implements Runnable, InputUser
         term.setVisible(false);
         handler.closeAll();
 
-        inputText("/saveusers");
-        
+        //inputText("/saveusers"); //Useless. What was I thinking? Input a command that doesn't execute unless a call is made to runCommands()? Let's just do it the other way
+        saveUsers();
+
         out("Done");
 
         System.exit(0);
@@ -135,16 +156,25 @@ public class Runner implements Runnable, InputUser
             }
             else period = null;
         }
-        
+
+        //Data Display
+        disp.setText(0, ( ( System.nanoTime() - startTime ) / 1000000000 ) + "s" );
+        disp.setText(1, "PeriodNum: " + periodNum );
+        if( period != null ) disp.setText(2, "Period: " + period.name );
+        else disp.setText(2, "Period: NULL" );
+        disp.setText(3, "Schedule: " + schName );
+        disp.setText(4, "Day: " + day );
+        //End Data Display
+
         handler.tick();
     }
-    
+
     public void runCommands() {
         while(commands.size() > 0) {
             inputCommand( commands.remove(0) );
         }
     }
-    
+
     public void inputText(String s) {
         commands.add(s);
     }
@@ -168,14 +198,16 @@ public class Runner implements Runnable, InputUser
 
             out("/viewuser <first name> <last name> - view a user and their permissions");
             out("/listperms - list available permissions");
-            
+
             out("/sch - view schedule");
-            
+
             out("/state <name> - set GUI state");
             out("/states - display GUI states");
-            
+
             out("/simswipe <String> - simulate a tag swipe by string");
             out("/statequeue - list the menu queue");
+            
+            out("/tweet <String> - send a tweet");
         }
 
         if(s.equals("/stop")) {
@@ -194,11 +226,7 @@ public class Runner implements Runnable, InputUser
         }
 
         if(s.equals("/saveusers")) {
-            out("Saving the world...");
-            for(int i=0; i<userList.size(); i++) {
-                userList.get(i).save();
-            }
-            out("Users saved.");
+            saveUsers();
         }
 
         if(Command.is("/createuser",s)) {
@@ -377,38 +405,45 @@ public class Runner implements Runnable, InputUser
         if(Command.is("/sch",s)) {
             out(sch.toString());
         }
-        
+
         if(Command.is("/state",s)) {
             ArrayList<String> args = Command.getArgs(s);
             if(args.size() < 2) {
                 out("Too few arguments!");
                 return;
             }
-            
+
             handler.setState(args.get(1));
         }
-        
+
         if(Command.is("/states",s)) {
             for( UserHandler.State state : UserHandler.State.values() ) {
                 out("STATE: " + state.getName() + ", " + state.getId() );
             }
         }
-        
+
         if(Command.is("/simswipe",s)) {
             ArrayList<String> args = Command.getArgs(s);
             if(args.size() < 2) {
                 out("Too few arguments!");
                 return;
             }
-            
+
             handler.tagSwipe( args.get(1) );
         }
-        
+
         if(Command.is("/statequeue",s)) {
             out("Menu Queue Size: " + handler.getQueue().size() );
             for( int i = 0; i < handler.getQueue().size(); i++) {
                 out( handler.getQueue().get(i).toString() );
             }
+        }
+        
+        if(Command.is("/tweet",s)) {
+            String msg = s.substring( 7, s.length() );
+            out(msg);
+            
+            handler.getTwitterHandler().send(msg);
         }
     }
 
@@ -417,5 +452,23 @@ public class Runner implements Runnable, InputUser
         schName = name;
         sch = schRead.readSchedule(schPath+"/"+schName);
         day = schRead.getDayByInt( new Date().getDay() );
+    }
+
+    public void wait(int n) {
+        
+        try{
+            Thread.sleep(n);
+        }catch(Exception e) {
+            return;
+        }
+
+    }
+    
+    public void saveUsers() {
+        out("Saving the world...");
+        for(int i=0; i<userList.size(); i++) {
+            userList.get(i).save();
+        }
+        out("Users saved.");
     }
 }
