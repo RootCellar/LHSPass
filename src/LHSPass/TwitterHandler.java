@@ -128,10 +128,10 @@ public class TwitterHandler
         return (int) ( ( Math.random() ) * 10000);
     }
 
-    public void send(String s) {
+    public boolean send(String s) {
         if(!setup) {
             out("CAN'T SEND: NOT SET UP");
-            return;
+            return false;
         }
 
         out("Attempting to send: " + s);
@@ -142,6 +142,7 @@ public class TwitterHandler
             working = true;
 
             out("Successfully sent: " + s);
+            
         }catch(Exception e) {
             working = false;
             out("Failed");
@@ -150,7 +151,10 @@ public class TwitterHandler
                 out( "at " + e.getStackTrace()[i].toString() );
             }
             //e.printStackTrace();
+            return false;
         }
+        
+        return true;
     }
 
 }
