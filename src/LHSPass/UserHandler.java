@@ -221,7 +221,7 @@ public class UserHandler implements InputUser
                 currentUser = null;
             }
             
-            if(s.equals("ADMIN")) {
+            if(s.equals("ADMIN") && currentUser.getPermissionList().hasType( "ADMIN" ) ) {
                 addState( State.DEBUG );
             }
             
@@ -261,7 +261,8 @@ public class UserHandler implements InputUser
             
             if(currentUser == null) {
                 out("User not recognized");
-                
+                twha.send("Unrecognized tag scanned!");
+                return;
             }
             else {
                 out("Found User: " + currentUser.toString() );
@@ -296,6 +297,34 @@ public class UserHandler implements InputUser
                 
                 setState( State.AWAIT_USER );
             }
+            else
+            {
+                User person = runner.getUserByTag(serial);
+                
+                if(person == null) return;
+                
+                if(person.getPermissionList().has("ADMIN_OVERRIDE")) {
+                    out("Admin scanned");
+                    out("Going back...");
+                    
+                    userLog("Admin released lock");
+                    
+                    goBack();
+                    
+                    twha.send("Admin " + person.getName() + " released USER_GONE lock");
+                }
+                else
+                {
+                    person.log("Swiped tag while someone else was gone");
+                    out(person.getName() + " swiped while " +currentUser.getName() + " was gone!");
+                    twha.send(person.getName() + " swiped while " +currentUser.getName() + " was gone!");
+                }
+                
+            }
+        }
+        
+        if( state.equals( State.DEBUG ) ) {
+            JOptionPane.showMessageDialog( null, "Read: " + serial );
         }
     }
     

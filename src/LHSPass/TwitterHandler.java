@@ -15,8 +15,8 @@ public class TwitterHandler
     private String accessToken = "Going to";
     private String accessTokenSecret = "Tell you?";
 
-    TwitterFactory twitterFactory = new TwitterFactory();
-    Twitter twitter = twitterFactory.getInstance();
+    TwitterFactory twitterFactory;
+    Twitter twitter;
 
     boolean working = false;
 
@@ -29,16 +29,23 @@ public class TwitterHandler
     public TwitterHandler(Runner r) {
         runner = r;
 
+        try{
+            twitterFactory = new TwitterFactory();
+            twitter = twitterFactory.getInstance();
+        }catch(Throwable e) {
+            e.printStackTrace();
+        }
+
         readInfo();
     }
 
     public void readInfo() {
-        
+
         out("Starting read...");
 
         try{
             new File("TwitterSecret.txt").createNewFile();
-            
+
             out("Ensured file is available.");
         }catch(Exception e) { //Can't create file
             return;
@@ -57,18 +64,18 @@ public class TwitterHandler
         ArrayList<String> stuff = new ArrayList<String>();
 
         out("Starting read...");
-        
+
         while(scanny.hasNextLine()) {
             stuff.add( scanny.nextLine() );
         }
-        
+
         out("Finished read");
 
         if(stuff.size() < 4) {
             out("Not enough info");
             return;
         }
-        
+
         out("Got the info. Setting keys...");
 
         consumerKey = stuff.get(0);
@@ -77,7 +84,7 @@ public class TwitterHandler
         accessTokenSecret = stuff.get(3);
 
         scanny.close();
-        
+
         out("Setting up twitter connection...");
 
         setup();
@@ -85,8 +92,14 @@ public class TwitterHandler
     }
 
     public void setup() {
-        twitter.setOAuthConsumer( consumerKey, consumerSecret );
-        twitter.setOAuthAccessToken( new AccessToken( accessToken, accessTokenSecret ) );
+
+        try{
+            twitter.setOAuthConsumer( consumerKey, consumerSecret );
+            twitter.setOAuthAccessToken( new AccessToken( accessToken, accessTokenSecret ) );
+        }catch(Throwable e) {
+            setup = false;
+            return;
+        }
 
         setup = true;
     }

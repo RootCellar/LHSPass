@@ -8,7 +8,7 @@ import java.io.*;
 import java.util.Date;
 
 public class Runner implements Runnable, InputUser
-{
+{   
     /**
      * Might need some enums here at some point, for things like:
      * 
@@ -34,6 +34,8 @@ public class Runner implements Runnable, InputUser
     FileHandler schRead = new FileHandler(this);
 
     UserHandler handler = new UserHandler(this);
+    
+    SerialReader sr = new SerialReader( handler );
 
     Schedule sch;
     Period period;
