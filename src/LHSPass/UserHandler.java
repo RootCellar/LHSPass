@@ -11,7 +11,6 @@ public class UserHandler implements InputUser
     enum State
     {
         AWAIT_USER( new DefaultMenu() ), //Await user tag swipe
-        //AWAIT_ADMIN, // Await admin override
         USER_MENU( new UserLeaveMenu() ), //User is at menu
         USER_GONE( new UserGoneMenu() ), //User left the room
         DEBUG( new DebugMenu() ), // Debug menu with buttons
