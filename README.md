@@ -3,7 +3,7 @@ LHS Pass Program
 by Darian Marvel
 ----------------
 
-Current state of program: Usable, but not fully functional
+Current state of program: Functional, ready for extensive testing.
 
 Development started 8/25/18
 
