@@ -29,14 +29,25 @@ public class TwitterHandler
     public TwitterHandler(Runner r) {
         runner = r;
 
+        /*
         try{
             twitterFactory = new TwitterFactory();
             twitter = twitterFactory.getInstance();
         }catch(Throwable e) {
             e.printStackTrace();
         }
+        */
 
         readInfo();
+    }
+    
+    public boolean isSetup() {
+        return setup;   
+    }
+    
+    //TODO: Don't let user leave room if twitter communication is not available
+    public boolean isWorking() {
+        return working;   
     }
 
     public void readInfo() {
