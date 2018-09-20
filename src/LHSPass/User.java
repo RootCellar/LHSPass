@@ -5,7 +5,7 @@ public class User
     private PermissionList permList = new PermissionList();
     private String firstName;
     private String lastName;
-    private String title = "";
+    private String title = "USER";
     private UserFileHandler fileHandler;
     private String tag = "0";
     private Logger logger = null;
@@ -26,6 +26,10 @@ public class User
     }
     
     public void save() {fileHandler.save();}
+    
+    public void setTitle(String t) {
+        title = t;
+    }
     
     public void setTag(String t) {
         tag = t;

@@ -6,41 +6,29 @@ import java.awt.event.*;
 
 import Util.*;
 
-public class DefaultMenu extends Menu implements ActionListener
+public class LockMenu extends Menu implements ActionListener
 {
         
-    JLabel topLabel = new JLabel("LHSPASS - By Darian Marvel");
-    //JLabel topLabel = getLabel("LHSPASS - By Darian Marvel"); //Font size doesn't change
+    JLabel topLabel = new JLabel("LHSPASS");
+    JLabel label2 = new JLabel("PROGRAM LOCKED BY ADMIN");
     
-    JLabel label2 = new JLabel("Swipe your tag!");
-    JLabel link = new JLabel("Source Code is at: Github.com/RootCellar/LHSPass");
-    JLabel credit = new JLabel("Credit: Mr. Benshoof (Ideas, Awesome Builder Dude) and Darian Marvel (Programmer Dude)");
-    JLabel dev = new JLabel("Development started 8/25/18, program ready for testing 9/19/18");
-    JLabel quo = new JLabel(" \" if ( youWant ) youCan(); else youCant(); \" ");
-    
-    public DefaultMenu() {
+    public LockMenu() {
         //setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );
         super();
         
         topLabel.setHorizontalAlignment(JLabel.CENTER);
         label2.setHorizontalAlignment(JLabel.CENTER);
-        link.setHorizontalAlignment(JLabel.CENTER);
-        credit.setHorizontalAlignment(JLabel.CENTER);
-        dev.setHorizontalAlignment(JLabel.CENTER);
-        quo.setHorizontalAlignment(JLabel.CENTER);
-        
-        //topLabel.setForeground(Color.BLUE);
-        //label2.setForeground(Color.YELLOW);
         
         JPanel top = new JPanel();
-        top.setLayout( new GridLayout(15, 1) );
+        top.setLayout( new GridLayout(2, 1) );
         
         top.add(topLabel);
         top.add(label2);
-        top.add(link);
-        top.add(credit);
-        top.add(dev);
-        top.add(quo);
+        //top.add( new JLabel("ONLY ADMIN CAN UNLOCK") );
+        
+        top.setBackground(Color.RED);
+        topLabel.setForeground(Color.WHITE);
+        label2.setForeground(Color.WHITE);
         
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout( new GridLayout(4, 1) );

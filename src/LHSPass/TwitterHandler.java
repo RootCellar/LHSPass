@@ -29,25 +29,22 @@ public class TwitterHandler
     public TwitterHandler(Runner r) {
         runner = r;
 
-        /*
         try{
             twitterFactory = new TwitterFactory();
             twitter = twitterFactory.getInstance();
         }catch(Throwable e) {
             e.printStackTrace();
         }
-        */
 
         readInfo();
     }
     
     public boolean isSetup() {
-        return setup;   
+        return setup;
     }
     
-    //TODO: Don't let user leave room if twitter communication is not available
     public boolean isWorking() {
-        return working;   
+        return working;
     }
 
     public void readInfo() {
@@ -68,7 +65,7 @@ public class TwitterHandler
 
         try{
             scanny = new Scanner(f); //Good ol' Scanny
-        }catch(Exception e) { //File not found
+        }catch(Exception e) { //Can't create scanner (File not found, can't read)
             return;
         }
 
@@ -98,8 +95,9 @@ public class TwitterHandler
 
         out("Setting up twitter connection...");
 
-        setup();
         working = true;
+        
+        setup();
     }
 
     public void setup() {
@@ -108,9 +106,13 @@ public class TwitterHandler
             twitter.setOAuthConsumer( consumerKey, consumerSecret );
             twitter.setOAuthAccessToken( new AccessToken( accessToken, accessTokenSecret ) );
         }catch(Throwable e) {
+            //e.printStackTrace();
             setup = false;
+            working = false;
             return;
         }
+        
+        out("Finished Setting up");
 
         setup = true;
     }
@@ -147,9 +149,12 @@ public class TwitterHandler
             working = false;
             out("Failed");
 
+            /*
             for(int i = 0; i < e.getStackTrace().length; i++) {
                 out( "at " + e.getStackTrace()[i].toString() );
             }
+            */
+           
             //e.printStackTrace();
             return false;
         }

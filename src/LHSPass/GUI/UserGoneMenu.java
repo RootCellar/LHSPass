@@ -14,7 +14,7 @@ public class UserGoneMenu extends Menu implements ActionListener
     JLabel loc = new JLabel("NULL");
     JLabel time = new JLabel("-1s");
     
-    JButton adminButton = getNewButton( "ADMIN", "ADMIN" );
+    JButton adminButton = getNewButton( "USELESS BUTTON", "USELESS BUTTON" );
     
     public UserGoneMenu() {
         //setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );

@@ -19,6 +19,8 @@ public class DebugMenu extends Menu implements ActionListener
         topLabel.setHorizontalAlignment(JLabel.CENTER);
         label2.setHorizontalAlignment(JLabel.CENTER);
         
+        topLabel.setForeground(Color.RED);
+        
         JPanel top = new JPanel();
         top.setLayout( new GridLayout(3, 1) );
         
@@ -33,7 +35,7 @@ public class DebugMenu extends Menu implements ActionListener
         buttonPanel.add( getNewButton( "SET SCHEDULE", "ADMIN_SCHEDULE_SET" ) );
         buttonPanel.add( getNewButton( "MOD USER", "ADMIN_USER_MODIFY" ) );
         
-        buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
+        buttonPanel.add( getNewButton( "LOCK", "LOCK" ) );
         buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
         buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
         buttonPanel.add( getNewButton( "BLANK", "BLANK" ) );
