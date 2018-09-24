@@ -8,10 +8,14 @@ import Util.*;
 
 public class LockMenu extends Menu implements ActionListener
 {
-        
+    /*
     JLabel topLabel = new JLabel("LHSPASS");
     JLabel label2 = new JLabel("PROGRAM LOCKED BY ADMIN");
+    */
     
+    JLabel topLabel = getLabel("LHSPASS", 63);
+    JLabel label2 = getLabel("PROGRAM LOCKED BY ADMIN", 63);
+   
     public LockMenu() {
         //setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );
         super();
@@ -26,7 +30,9 @@ public class LockMenu extends Menu implements ActionListener
         top.add(label2);
         //top.add( new JLabel("ONLY ADMIN CAN UNLOCK") );
         
-        top.setBackground(Color.RED);
+        //top.setBackground(Color.RED); //Alright, we can tone the red down some
+        top.setBackground( new Color( (float) 0.6, (float) 0, (float) 0) );
+        
         topLabel.setForeground(Color.WHITE);
         label2.setForeground(Color.WHITE);
         

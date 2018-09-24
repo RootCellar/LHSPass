@@ -9,8 +9,13 @@ import Util.*;
 public class UserLeaveMenu extends Menu implements ActionListener
 {
     
+    /*
     JLabel topLabel = new JLabel("Where would you like to go?");
     JLabel nameLabel = new JLabel("NAME_OF_USER");
+    */
+    
+    JLabel topLabel = getLabel("Where would you like to go?");
+    JLabel nameLabel = getLabel("NAME_OF_USER");
     
     JButton restroomButton = getNewButton( "RESTROOM", "RESTROOM" );
     JButton lockerButton = getNewButton( "LOCKER", "LOCKER" );

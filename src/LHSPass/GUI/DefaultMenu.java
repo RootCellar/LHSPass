@@ -9,14 +9,23 @@ import Util.*;
 public class DefaultMenu extends Menu implements ActionListener
 {
         
-    JLabel topLabel = new JLabel("LHSPASS - By Darian Marvel");
-    //JLabel topLabel = getLabel("LHSPASS - By Darian Marvel"); //Font size doesn't change
+    //JLabel topLabel = new JLabel("LHSPASS - By Darian Marvel");
+    JLabel topLabel = getLabel("LHSPASS - By Darian Marvel");
     
+    /*
     JLabel label2 = new JLabel("Swipe your tag!");
     JLabel link = new JLabel("Source Code is at: Github.com/RootCellar/LHSPass");
     JLabel credit = new JLabel("Credit: Mr. Benshoof (Ideas, Awesome Builder Dude) and Darian Marvel (Programmer Dude)");
     JLabel dev = new JLabel("Development started 8/25/18, program ready for testing 9/19/18");
     JLabel quo = new JLabel(" \" if ( youWant ) youCan(); else youCant(); \" ");
+    */
+    
+    JLabel label2 = getLabel("Swipe your tag!", 81); //Extra Large
+    
+    JLabel link = getLabel("Source Code is at: Github.com/RootCellar/LHSPass");
+    JLabel credit = getLabel("Credit: Mr. Benshoof (Ideas, Awesome Builder Dude) and Darian Marvel (Programmer Dude)");
+    JLabel dev = getLabel("Development started 8/25/18, program ready for testing 9/19/18");
+    JLabel quo = getLabel(" \" if ( youWant ) youCan(); else youCant(); \" ");
     
     public DefaultMenu() {
         //setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );
@@ -29,11 +38,21 @@ public class DefaultMenu extends Menu implements ActionListener
         dev.setHorizontalAlignment(JLabel.CENTER);
         quo.setHorizontalAlignment(JLabel.CENTER);
         
+        Color col = Color.BLACK;
+        
+        topLabel.setForeground(col);
+        label2.setForeground(col);
+        link.setForeground(col);
+        credit.setForeground(col);
+        dev.setForeground(col);
+        quo.setForeground(col);
+        
+        
         //topLabel.setForeground(Color.BLUE);
         //label2.setForeground(Color.YELLOW);
         
         JPanel top = new JPanel();
-        top.setLayout( new GridLayout(15, 1) );
+        top.setLayout( new GridLayout(7, 1) );
         
         top.add(topLabel);
         top.add(label2);
@@ -41,6 +60,9 @@ public class DefaultMenu extends Menu implements ActionListener
         top.add(credit);
         top.add(dev);
         top.add(quo);
+        
+        //top.setBackground(Color.GREEN); //Some complain that it looks too bright
+        top.setBackground( new Color( (float) 0, (float) 0.8, (float) 0) ); //A bit of a darker green, easier on the eyes
         
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout( new GridLayout(4, 1) );

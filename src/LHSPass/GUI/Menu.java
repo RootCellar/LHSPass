@@ -9,7 +9,9 @@ public class Menu extends JFrame
 {
     InputUser user;
     
-    static int FONT_SIZE = 50;
+    static int FONT_SIZE = 27;
+    
+    static Font FONT_NORMAL = new Font("Serif", Font.PLAIN, FONT_SIZE);
     
     public Menu() {
         setPreferredSize( new Dimension( 1920, 1080 ) );
@@ -25,7 +27,17 @@ public class Menu extends JFrame
     public JLabel getLabel(String name) {
         JLabel toRet = new JLabel(name);
         
-        toRet.setFont( toRet.getFont().deriveFont( FONT_SIZE ) );
+        //toRet.setFont( toRet.getFont().deriveFont( FONT_SIZE ) );
+        toRet.setFont( FONT_NORMAL );
+        
+        return toRet;
+    }
+    
+    public JLabel getLabel(String name, int size) {
+        JLabel toRet = new JLabel(name);
+        
+        //toRet.setFont( toRet.getFont().deriveFont( FONT_SIZE ) );
+        toRet.setFont( new Font("Serif", Font.PLAIN, size) );
         
         return toRet;
     }
