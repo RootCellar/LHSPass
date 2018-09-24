@@ -9,12 +9,19 @@ import Util.*;
 public class UserGoneMenu extends Menu implements ActionListener
 {
     
+    /*
     JLabel topLabel = new JLabel("User has gone");
     JLabel nameLabel = new JLabel("NAME_OF_USER");
     JLabel loc = new JLabel("NULL");
     JLabel time = new JLabel("-1s");
+    */
     
-    JButton adminButton = getNewButton( "ADMIN", "ADMIN" );
+    JLabel topLabel = getLabel("User has gone");
+    JLabel nameLabel = getLabel("NAME_OF_USER");
+    JLabel loc = getLabel("NULL");
+    JLabel time = getLabel("-1s");
+    
+    JButton adminButton = getNewButton( "USELESS BUTTON", "USELESS BUTTON" );
     
     public UserGoneMenu() {
         //setBorder( BorderFactory.createEmptyBorder(5,5,5,5) );
@@ -25,6 +32,13 @@ public class UserGoneMenu extends Menu implements ActionListener
         loc.setHorizontalAlignment(JLabel.CENTER);
         time.setHorizontalAlignment(JLabel.CENTER);
         
+        Color col = Color.BLACK;
+        
+        topLabel.setForeground(col);
+        nameLabel.setForeground(col);
+        loc.setForeground(col);
+        time.setForeground(col);
+        
         JPanel top = new JPanel();
         top.setLayout( new GridLayout(4, 1) );
         
@@ -32,6 +46,8 @@ public class UserGoneMenu extends Menu implements ActionListener
         top.add(topLabel);
         top.add(loc);
         top.add(time);
+        
+        top.setBackground(Color.RED);
         
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout( new GridLayout(1, 1) );
