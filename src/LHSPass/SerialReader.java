@@ -3,8 +3,6 @@ import com.fazecast.jSerialComm.*;
 public class SerialReader implements SerialPortPacketListener
 {
 
-    SerialPort sensor = null;
-
     boolean working = false;
 
     int PORT_USE = 2;
@@ -35,6 +33,7 @@ public class SerialReader implements SerialPortPacketListener
             }
             
         }
+        
         /*
         if(ports.length >= PORT_USE + 1) {
         sensor = ports[PORT_USE];

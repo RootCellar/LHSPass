@@ -38,6 +38,14 @@ public class TwitterHandler
 
         readInfo();
     }
+    
+    public boolean isSetup() {
+        return setup;
+    }
+    
+    public boolean isWorking() {
+        return working;
+    }
 
     public void readInfo() {
 
@@ -57,7 +65,7 @@ public class TwitterHandler
 
         try{
             scanny = new Scanner(f); //Good ol' Scanny
-        }catch(Exception e) { //File not found
+        }catch(Exception e) { //Can't create scanner (File not found, can't read)
             return;
         }
 
@@ -87,8 +95,9 @@ public class TwitterHandler
 
         out("Setting up twitter connection...");
 
-        setup();
         working = true;
+        
+        setup();
     }
 
     public void setup() {
@@ -97,9 +106,13 @@ public class TwitterHandler
             twitter.setOAuthConsumer( consumerKey, consumerSecret );
             twitter.setOAuthAccessToken( new AccessToken( accessToken, accessTokenSecret ) );
         }catch(Throwable e) {
+            //e.printStackTrace();
             setup = false;
+            working = false;
             return;
         }
+        
+        out("Finished Setting up");
 
         setup = true;
     }
@@ -117,10 +130,10 @@ public class TwitterHandler
         return (int) ( ( Math.random() ) * 10000);
     }
 
-    public void send(String s) {
+    public boolean send(String s) {
         if(!setup) {
             out("CAN'T SEND: NOT SET UP");
-            return;
+            return false;
         }
 
         out("Attempting to send: " + s);
@@ -131,15 +144,22 @@ public class TwitterHandler
             working = true;
 
             out("Successfully sent: " + s);
+            
         }catch(Exception e) {
             working = false;
             out("Failed");
 
+            /*
             for(int i = 0; i < e.getStackTrace().length; i++) {
                 out( "at " + e.getStackTrace()[i].toString() );
             }
+            */
+           
             //e.printStackTrace();
+            return false;
         }
+        
+        return true;
     }
 
 }

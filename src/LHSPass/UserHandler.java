@@ -11,10 +11,10 @@ public class UserHandler implements InputUser
     enum State
     {
         AWAIT_USER( new DefaultMenu() ), //Await user tag swipe
-        //AWAIT_ADMIN, // Await admin override
         USER_MENU( new UserLeaveMenu() ), //User is at menu
         USER_GONE( new UserGoneMenu() ), //User left the room
         DEBUG( new DebugMenu() ), // Debug menu with buttons
+        LOCK( new LockMenu() ), //Menu when an admin locks the program
         ;
 
         String name;
@@ -70,7 +70,7 @@ public class UserHandler implements InputUser
         
         twha = new TwitterHandler(r);
         
-        twha.send( "User Handler up and running" );
+        //twha.send( "User Handler up and running" ); //Debug tweets are annoying
     }
     
     public TwitterHandler getTwitterHandler() {
@@ -180,7 +180,7 @@ public class UserHandler implements InputUser
         if( state.equals(State.USER_GONE) ) {
             UserGoneMenu m = (UserGoneMenu) state.getMenu();
             
-            if( currentUser != null ) m.setName( currentUser.getName() );
+            if( currentUser != null ) m.setName( currentUser.getDisplayName() );
             
             m.setTime( System.nanoTime() - menuSetTime );
             
@@ -204,6 +204,19 @@ public class UserHandler implements InputUser
             if(s.equals("BACK")) {
                 goBack();
             }
+            else if(s.equals("LOCK")) {
+                
+                if(currentUser == null) setState( State.AWAIT_USER );
+                
+                if( currentUser.getPermissionList().has("ADMIN_LOCK") ) {
+                    setState( State.LOCK );
+                    
+                    out("Admin " + currentUser.getName() + " locked the program");
+                    twha.send("Admin " + currentUser.getName() + " locked the program");
+                }
+                
+                
+            }
             else runner.inputText(s);
             
             return;
@@ -221,11 +234,15 @@ public class UserHandler implements InputUser
                 currentUser = null;
             }
             
+            //Check for admin permission, just in case something weird happens
+            //(GUI shouldn't allow user to tap admin button if they don't have admin perm, but you never know)
             if(s.equals("ADMIN") && currentUser.getPermissionList().hasType( "ADMIN" ) ) {
                 addState( State.DEBUG );
             }
             
             if( s.equals("RESTROOM") || s.equals("LOCKER") || s.equals("WATER") || s.equals("OTHER") ) {
+                
+                went = s; //No bugs now
                 
                 boolean has = currentUser.getPermissionList().has( "USER_" + s );
                 
@@ -235,12 +252,22 @@ public class UserHandler implements InputUser
                     return;
                 }
                 
+                boolean tweetSuccess = twha.send( currentUser.getName() + " left for " + went );
+                
+                //Don't let user leave if teacher can't be notified.
+                //If program is in debug mode, tweets don't matter so much
+                if(!tweetSuccess && !runner.DEBUG) {
+                    out("TWEET FAILED");
+                    userLog("Couldn't leave the room: Tweet failed");
+                    JOptionPane.showMessageDialog( null, "Sorry, but you can't leave: Twitter Connection failed" );
+                    return;
+                }
+                
                 addState(State.USER_GONE);
                 
-                went = s;
+                //went = s; //" User left for the Too bad you'll never see this. If you do, it's a bug. "
                 
                 out("Successfully allowed a student to leave the room: " + currentUser.getName() + " --> " + went );
-                twha.send( currentUser.getName() + " left for " + went );
                 
                 
                 userLog("Left to go to the " + s );
@@ -253,6 +280,20 @@ public class UserHandler implements InputUser
 
     public void tagSwipe(String serial) {
         out("Received tag: " + serial);
+        
+        if( state.equals( State.LOCK ) ) {
+            User person = runner.getUserByTag(serial);
+            
+            if(person == null) return;
+            
+            if( person.getPermissionList().has("ADMIN_UNLOCK") ) {
+                setState( State.AWAIT_USER );
+                out("Program unlocked by " + person.getName() );
+                twha.send("Program unlocked by " + person.getName() );
+            }
+            
+            return;
+        }
         
         if( state.equals( State.AWAIT_USER ) ) {
             //addState( State.USER_MENU );
@@ -271,7 +312,7 @@ public class UserHandler implements InputUser
                 
                 m.setAdmin(false);
                 
-                m.setName("Hello, " + currentUser.getName());
+                m.setName("Hello, " + currentUser.getDisplayName() );
                 
                 out("IS AN ADMIN: " + currentUser.getPermissionList().hasType("ADMIN") );
                 if(currentUser.getPermissionList().hasType("ADMIN")) {
@@ -293,7 +334,7 @@ public class UserHandler implements InputUser
                 userLog("Returned to the room from " + went);
                 twha.send(currentUser.getName() + " returned to the room from " + went + " after " + ( ( System.nanoTime() - menuSetTime ) / 1000000000 ) + "s" );
                 
-                went = "Too bad you'll never see this. If you do, it's a bug.";
+                went = "Too bad you'll never see this. If you do, it's a bug."; //Actually helped discover a bug
                 
                 setState( State.AWAIT_USER );
             }
@@ -307,7 +348,7 @@ public class UserHandler implements InputUser
                     out("Admin scanned");
                     out("Going back...");
                     
-                    userLog("Admin released lock");
+                    userLog("Admin " + person.getName() + "released lock");
                     
                     goBack();
                     

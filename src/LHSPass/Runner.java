@@ -9,15 +9,9 @@ import java.util.Date;
 
 public class Runner implements Runnable, InputUser
 {   
-    /**
-     * Might need some enums here at some point, for things like:
-     * 
-     * - Menus
-     * - Program States
-     * - RFID Reader States (could be in separate class that handles RFID input)
-     * 
-     */
-
+    
+    long startTime = System.nanoTime();
+    
     Logger runLog = new Logger("Runner","Log");
 
     boolean going = false;
@@ -25,8 +19,6 @@ public class Runner implements Runnable, InputUser
 
     Terminal term = new Terminal();
     DataDisplay disp = new DataDisplay(20, 2);
-
-    long startTime = System.nanoTime();
 
     ArrayList<User> userList = new ArrayList<User>();
     ArrayList<String> commands = new ArrayList<String>();
@@ -43,9 +35,17 @@ public class Runner implements Runnable, InputUser
     String schPath = "Schedules";
     String schName = "Normal";
     String day = "";
+    
+    boolean DEBUG = false;
 
     public static void main(String args[]) {
         Runner r = new Runner();
+        
+        if(args.length>0 && args[0].equals("DEBUG")) {
+            r.DEBUG = true;
+            r.out("WARNING: PROGRAM IS IN DEBUG MODE");
+        }
+        
         r.start();
     }
 
@@ -66,6 +66,8 @@ public class Runner implements Runnable, InputUser
     }
 
     public void setup() {
+        out("Setting up...");
+        
         term.setUser(this);
 
         term.setVisible(false);
@@ -73,13 +75,17 @@ public class Runner implements Runnable, InputUser
         openDebug();
 
         userList = UserFileHandler.readAll();
+        
+        out("Done setting up");
     }
 
     public void start() {
         setup();
+        
+        out("Starting main thread...");
 
-        new Thread(this).start();
         going = true;
+        new Thread(this).start();
     }
 
     public void stop() {
@@ -98,7 +104,11 @@ public class Runner implements Runnable, InputUser
         
         int exceptionsInRow = 0; //Keep track of the number interrupted loops in a row
         
-        handler.getTwitterHandler().send( "Program starting. Entering main loop...");
+        //handler.getTwitterHandler().send( "Program starting. Entering main loop..."); //Debug tweets are annoying
+        
+        if(DEBUG) out("WARNING: DEBUG MODE ON");
+        
+        out("Took " + ( (double) (System.nanoTime() - startTime) ) / 1000000000 + "s to start");
         
         loop: while(going) {
             try{
@@ -128,7 +138,7 @@ public class Runner implements Runnable, InputUser
             }
         }
         
-        handler.getTwitterHandler().send( "Program shutting down..." );
+        //handler.getTwitterHandler().send( "Program shutting down..." ); //Debug tweets are annoying
 
         out("Exited loop");
 
@@ -154,7 +164,7 @@ public class Runner implements Runnable, InputUser
             periodNum = sch.currentPeriod;
             if(periodNum >= 0) {
                 period = sch.periods.get(periodNum);
-                //out(period.toString());
+                //out(period.toString()); //Pointer, anyone?
             }
             else period = null;
         }
@@ -210,6 +220,9 @@ public class Runner implements Runnable, InputUser
             out("/statequeue - list the menu queue");
             
             out("/tweet <String> - send a tweet");
+            
+            out("/setusertitle <First Name> <Last Name> <String> - set a user's title");
+            out("/admins - get admin list");
         }
 
         if(s.equals("/stop")) {
@@ -223,7 +236,7 @@ public class Runner implements Runnable, InputUser
             for(int i=0; i<userList.size(); i++) {
                 User current = userList.get(i);
 
-                out(current.getName() + " " + current.getTag());
+                out(current.getDisplayName() + " " + current.getTag());
             }
         }
 
@@ -241,6 +254,10 @@ public class Runner implements Runnable, InputUser
 
             User u = new User( args.get(1), args.get(2) );
             userList.add(u);
+            
+            //u.getPermissionList().addByType("USER"); //There's always a better way
+            u.giveUserPerms(); //Fix newly created users having no permissions
+            
             u.save();
 
             out("User created!");
@@ -446,6 +463,53 @@ public class Runner implements Runnable, InputUser
             out(msg);
             
             handler.getTwitterHandler().send(msg);
+        }
+        
+        if(Command.is("/setusertitle",s)) {
+            ArrayList<String> args = Command.getArgs(s);
+
+            if(args.size() < 4) {
+                out("Too few arguments!");
+                return;
+            }
+
+            User u = null;
+            for(int i=0; i<userList.size(); i++) {
+                if( userList.get(i).getName().equals( args.get(1) + " " + args.get(2) ) ) {
+                    u = userList.get(i);
+                }
+            }
+
+            if(u == null) {
+                out("User not found");
+                return;
+            }
+            
+            String toSet = args.get(3);
+            
+            for(int i=4; i<args.size(); i++) {
+                toSet += " "  + args.get(i);
+            }
+
+            u.setTitle(toSet);
+
+            out("User " + u.getDisplayName() + "'s title set to " + toSet );
+        }
+        
+        if(s.equals("/admins")) {
+            int x = 0;
+            out(userList.size() + " users in total");
+
+            for(int i=0; i<userList.size(); i++) {
+                User current = userList.get(i);
+
+                if(current.getPermissionList().hasType("ADMIN")) {
+                    out(current.getDisplayName() + " " + current.getTag());
+                    x++;
+                }
+            }
+            
+            out(x + " admins");
         }
     }
 

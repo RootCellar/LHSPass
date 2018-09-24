@@ -21,11 +21,12 @@ public class UserFileHandler
     File path;
     File permFile;
     File tagFile;
+    File titleFile;
 
     public UserFileHandler(User u) {
         user = u;
 
-        makeFiles();
+        //makeFiles(); //Not necessary, called when reading files
 
         read();
     }
@@ -48,11 +49,13 @@ public class UserFileHandler
 
         permFile = new File( getPath() + "/" + "perms.txt");
         tagFile = new File( getPath() + "/" + "tag.txt");
+        titleFile = new File( getPath() + "/" + "title.txt");
 
         try{
 
             if( !permFile.exists() ) permFile.createNewFile();
             if( !tagFile.exists() ) tagFile.createNewFile();
+            if( !titleFile.exists() ) titleFile.createNewFile();
 
         }catch(Exception e) {
             working = false;
@@ -190,6 +193,23 @@ public class UserFileHandler
             out("Read "+in);
 
             user.setTag(in);
+        }
+
+        reader.close();
+        
+        try{
+            reader = new Scanner(titleFile);
+        }catch(Exception e) {
+            working = false;
+            return;
+        }
+        
+        if(reader.hasNext()) {
+            String in = reader.nextLine();
+
+            out("Read Title: " + in);
+
+            user.setTitle(in);
         }
 
         reader.close();

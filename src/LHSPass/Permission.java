@@ -26,7 +26,8 @@ public enum Permission
     ADMIN_PERM_ADD("ADMIN"),
     ADMIN_PERM_REMOVE("ADMIN"),
     ADMIN_USER_CREATE("ADMIN"),
-    ADMIN_USER_DELETE("ADMIN");
+    ADMIN_USER_DELETE("ADMIN"),
+    ;
     
     String name;
     String type;
